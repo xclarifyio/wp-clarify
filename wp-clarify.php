@@ -20,12 +20,14 @@ class Clarify {
 	}
 
 	public function hooks() {
-		add_action( 'admin_init', array( $this, 'admin' ) );
+		if( is_admin() ) {
+			add_action( 'init', array( $this, 'admin' ) );
+		}
 	}
 
 	public function admin() {
-		new Clarify_Admin;
+		$admin = new Clarify_Admin;
 	}
 }
 
-$clarify = new Clarify;
+new Clarify;
