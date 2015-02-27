@@ -1,0 +1,12 @@
+{
+  "name": "technosailor/wp-clarify",
+  "type": "wordpress-plugin",
+  "minimum-stability": "dev",
+  "require-dev": {},
+  "require": {},
+  "version": "1.0",
+  "dist": {
+    "url": "... stable archive package URI ...",
+    "type": "zip"
+  }
+}
