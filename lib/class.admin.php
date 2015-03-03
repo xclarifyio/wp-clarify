@@ -40,6 +40,8 @@ class Clarify_Admin {
 			</form>
 		</div>
 		<?php
+
+		Clarify_API::get_bundles();
 	}
 
 	public function save() {
