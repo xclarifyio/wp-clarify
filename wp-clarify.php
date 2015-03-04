@@ -23,7 +23,21 @@ register_deactivation_hook( __FILE__, array( 'Clarify', 'deactivate' ) );
 
 
 class Clarify {
+
+	public $supported_media;
+
 	public function __construct() {
+
+		$this->supported_media = array(
+			'mpeg'  => 'audio/mpeg',
+			'mp3'   => 'audio/mpeg',
+			'wav'   => 'audio/wav',
+			'mp4'   => 'video/mp4',
+			'mov'   => 'video/quicktime',
+			'ogg'   => 'audio/ogg',
+			'flac'  => 'audio/flac',
+			'webm'  => 'video/webm'
+		);
 		$this->hooks();
 	}
 
@@ -43,10 +57,10 @@ class Clarify {
 
 	public function hooks() {
 
-		/*if( is_admin() ) {
+		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
 		}
-		*/
+
 	}
 
 	public function admin() {
@@ -58,4 +72,4 @@ class Clarify {
 	}
 }
 
-new Clarify;
+$clarifyio = new Clarify;

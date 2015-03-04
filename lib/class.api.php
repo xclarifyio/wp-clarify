@@ -2,22 +2,40 @@
 
 class Clarify_API_Base {
 
-	public static $headers;
+	const API_BASE = 'https://api.clarify.io/v1/';
+
+	public $headers;
+
 	public function __construct() {
 		$apikey = get_option( 'clarify_apikey' );
-		self::$headers = array( 'headers' => array( 'Bearer ' . $apikey ) );
+		$this->headers = array( 'headers' => array( 'Authorization' => 'Bearer ' . $apikey ) );
 	}
 }
 class Clarify_API extends Clarify_API_Base {
 
-	const API_BASE = 'https://api.clarify.io/v1/';
+	public function get_bundles( $limit = 5, $embed = 'items', $iterator = false ) {
 
-	public static function get_bundles( $limit = 5, $embed = 'items', $iteerator = false ) {
-		//parent::__construct();
-		echo '<pre>';print_r(self::$headers);echo'</pre>';
-		$endpoint = esc_url_raw( self::API_BASE . '/bundles/' );
-		$response = wp_remote_get( $endpoint, parent::$headers );
-		$body = wp_remote_retrieve_body( $response );
-		//echo '<pre>';print_r( $body );echo'</pre>';
+		$body = wp_cache_get( 'bundles', 'bundles' );
+		if( !$body ) {
+			$endpoint = esc_url_raw( parent::API_BASE . 'bundles' );
+			$response = wp_remote_get( $endpoint, $this->headers );
+			$body     = wp_remote_retrieve_body( $response );
+			wp_cache_set( 'bundles', $body, 'bundles', 3600 );
+		}
+		return json_decode( $body );
+	}
+
+	public function get_bundle( $path ) {
+		$bits = explode( '/', $path );
+		$id = array_pop( $bits );
+
+		$body = wp_cache_get( 'bundle ' . $id, 'bundles' );
+		if( !$body ) {
+			$endpoint = esc_url_raw( parent::API_BASE . 'bundle/' . $id );
+			$response = wp_remote_get( $endpoint, $this->headers );
+			$body     = wp_remote_retrieve_body( $response );
+			wp_cache_set( 'bundle ' . $id, $body, 'bundles', 86400 );
+		}
+		return json_decode( $body );
 	}
 }
