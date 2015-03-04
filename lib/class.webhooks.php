@@ -1,59 +1,58 @@
 <?php
 
-class Clarify_Webhooks {
+class Clarify_Webhooks_Bundle_Notify {
 
-	public function __construct() {
-
-		add_filter( 'init', array( $this, 'endpoints' ) );
-		add_filter( 'query_vars', array( $this, 'query_vars' ) );
-
-		add_action( 'template_redirect', array( $this, 'notification_bundle' ) );
-	}
-
-	public function query_vars( $vars ) {
-		$vars[] = 'clarify_notify_type';
-		$vars[] = 'clarify_notify_id';
-		return $vars;
-	}
-
-	public function endpoints() {
-		global $wp_rewrite;
-
-		$new = array(
-			'^clarify/notify/track/$' => 'index.php?clarify_notify_type=track',
-			'^clarify/notify/bundle/$' => 'index.php?clarify_notify_type=bundle',
-		);
-
-		$wp_rewrite->rules = $new + $wp_rewrite->rules;
-		return $wp_rewrite;
-	}
-
+	/**
+	 * Catches postback data from Clarify and inserts related metadata into the appropriate post ID
+	 *
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @since 1.0.0
+	 * @return bool
+	 */
 	public function recieve() {
-		// Do Nothing
-	}
-}
 
-class Clarify_Webhooks_Track_Notify extends Clarify_Webhooks {
-
-	public function __construct() {
-		parent::__construct();
-	}
-
-	public function recieve() {
-		if( !is_array( $_POST ) )
+		if( filter_input( INPUT_SERVER, 'REQUEST_METHOD' ) != 'POST' ) {
 			return false;
+		}
 
 		$required = array(
 			'bundle_id',
 			'track_id',
 			'external_id'
 		);
+		$data = json_decode( file_get_contents('php://input') );
+
+		if( !is_array( $data ) )
+			return false;
 
 		foreach( $required as $key ) {
-			if( !array_key_exists( $key, $_POST ) )
-				return false;
+			if( !array_key_exists( $key, $data ) )
+				continue;
 		}
 
-		error_log( print_r( json_decode( $_POST, true ) ), 1, 'aaron@technosailor.com' );
+		$id = (int) $data->external_id;
+		add_post_meta( $id, '_clarify_track_id', $this->_validate( $data->track_id, 'hex' ) );
+		add_post_meta( $id, '_clarify_bundle_id', $this-_validate( $date->bundle_id, 'hex' ) );
+	}
+
+	/**
+	 * Simple validation. Leaving it scaffolded for more types
+	 *
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @since 1.0.0
+	 * @param $str
+	 * @param $type
+	 *
+	 * @return bool
+	 */
+	protected function _validate( $str, $type ) {
+		switch( $type ) {
+			case 'hex' :
+				$safe = ( ctype_xdigit( $str ) ) ? true : false;
+				break;
+			default :
+				break;
+		}
+		return ( $safe ) ? $str : false;
 	}
 }

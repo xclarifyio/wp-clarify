@@ -86,7 +86,7 @@ class Clarify_Admin {
 		$sql = "SELECT ID, meta_value FROM $wpdb->posts LEFT JOIN $wpdb->postmeta ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id) WHERE $wpdb->postmeta.meta_key='enclosure'";
 		$results = $wpdb->get_results( $sql );
 
-		$api = new Clarify_API;
+		$api = new Clarify_Bundle_API;
 		foreach( $results as $track ) {
 			$val = explode( "\n", $track->meta_value );
 

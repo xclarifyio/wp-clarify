@@ -57,6 +57,13 @@ class Clarify {
 
 	public function hooks() {
 
+		add_action( 'init', function(){
+			$webhook = new Clarify_Webhooks_Bundle_Notify;
+			$webhook->recieve();
+		} );
+
+		add_action( 'save_post', array( $this, 'save_post' ) );
+
 		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
 		}
@@ -67,8 +74,18 @@ class Clarify {
 		$admin = new Clarify_Admin;
 	}
 
-	public function save_post() {
+	public function save_post( $post_id ) {
+		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+			return false;
 
+		if ( wp_is_post_revision( $post_id ) )
+			return;
+
+		if( 'publish' != get_post_status( $post_id ) )
+			return false;
+
+		$api = new Clarify_Bundle_API;
+		$api->save_bundle( $post_id );
 	}
 }
 
