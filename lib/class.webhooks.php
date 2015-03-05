@@ -34,7 +34,7 @@ class Clarify_Webhooks_Bundle_Notify {
 			return false;
 
 		$id = (int) $data->external_id;
-		//file_put_contents( ABSPATH . '/log.txt', print_r( $data, true ) );
+
 		if( $data->track_id )
 			update_post_meta( $id, '_clarify_track_id', $data->track_id );
 		if( $data->bundle_id )

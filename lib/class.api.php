@@ -80,8 +80,7 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 
 		$args = array_merge_recursive( $this->headers, $payload );
 		$request = wp_remote_post( parent::API_BASE . 'bundles', $args );
-		$body = wp_remote_retrieve_body( $request );
-		//echo '<prE>';print_r($request);exit;
+
 		if( '201' == wp_remote_retrieve_response_code( $request ) )
 			return true;
 

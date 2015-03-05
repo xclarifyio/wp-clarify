@@ -26,9 +26,7 @@ class Clarify_Admin {
 	}
 
 	public function menu() {
-		$hook = add_options_page( __( 'Clarify', 'clarify' ), __( 'Clarify', 'clarify' ), 'manage_options', 'clarify.php', array( $this, 'panel' ), 'dashicons-media-interactive', 30 );
-
-		//add_action( 'admin_enqueue_scripts-' . $hook, 'clarify-admin' );
+		add_options_page( __( 'Clarify', 'clarify' ), __( 'Clarify', 'clarify' ), 'manage_options', 'clarify.php', array( $this, 'panel' ), 'dashicons-media-interactive', 30 );
 	}
 
 	public function panel() {
@@ -79,40 +77,4 @@ class Clarify_Admin {
 
 		update_option( 'clarify_apikey', $_POST['api_key'] );
 	}
-
-	public function clarify_bulk() {
-		// Never use raw SQL... unless the database overhead is too great not to... such as potentially thousands of queries for thousands of posts
-		global $wpdb;
-		$sql = "SELECT ID, meta_value FROM $wpdb->posts LEFT JOIN $wpdb->postmeta ON ( $wpdb->posts.ID = $wpdb->postmeta.post_id) WHERE $wpdb->postmeta.meta_key='enclosure'";
-		$results = $wpdb->get_results( $sql );
-
-		$api = new Clarify_Bundle_API;
-		foreach( $results as $track ) {
-			$val = explode( "\n", $track->meta_value );
-
-			// Make sure this is actually an attached WordPress enclosure
-			if( !is_array( $val ) )
-				continue;
-
-			// Make sure the enclosure is among the supported media types
-			$mimetype = $val[2];
-			if( !in_array( $clarifyio->supported_media[$mimetype] ) )
-				continue;
-
-			// Extract the valid media url
-			$url = $val[0];
-
-			// Construct the object
-			$payload = (object) array(
-				'name'          => '',
-				'media_url'     => esc_url( $url ),
-				'external_id'   => '',
-				'metadata'      => '',
-			);
-		}
-
-		echo wp_json_encode( $results );
-		exit;
-	}
-
 }
