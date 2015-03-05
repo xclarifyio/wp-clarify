@@ -51,18 +51,18 @@ class Clarify {
 		if( defined( WP_LANG_DIR ) ) {
 			$locale = apply_filters( 'plugin_locale', get_locale(), 'clarify' );
 			load_textdomain( 'clarify', WP_LANG_DIR . '/clarify/clarify-' . $locale . '.mo' );
-			load_plugin_textdomain( 'brightcove', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+			load_plugin_textdomain( 'clarify', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 		}
 	}
 
 	public function hooks() {
 
-		add_action( 'init', function(){
+		add_action( 'plugins_loaded', function(){
 			$webhook = new Clarify_Webhooks_Bundle_Notify;
 			$webhook->recieve();
 		} );
 
-		add_action( 'save_post', array( $this, 'save_post' ) );
+		add_action( 'publish_post', array( $this, 'save_post' ), 99 );
 
 		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
@@ -85,7 +85,7 @@ class Clarify {
 			return false;
 
 		$api = new Clarify_Bundle_API;
-		$api->save_bundle( $post_id );
+		return $api->save_bundle( $post_id );
 	}
 }
 

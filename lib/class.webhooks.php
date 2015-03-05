@@ -1,5 +1,4 @@
 <?php
-
 class Clarify_Webhooks_Bundle_Notify {
 
 	/**
@@ -10,8 +9,17 @@ class Clarify_Webhooks_Bundle_Notify {
 	 * @return bool
 	 */
 	public function recieve() {
+		$data = new stdClass;
+		$data->module_id = false;
+		$data->track_id = false;
+		$data->external_id = false;
 
-		if( filter_input( INPUT_SERVER, 'REQUEST_METHOD' ) != 'POST' ) {
+		$data = file_get_contents('php://input');
+
+		if( !$this->is_json( $data ) )
+			return false;
+		$data = json_decode( $data );
+		if( filter_input( INPUT_SERVER, 'REQUEST_METHOD' ) != 'POST' && $data->module_id ) {
 			return false;
 		}
 
@@ -20,39 +28,25 @@ class Clarify_Webhooks_Bundle_Notify {
 			'track_id',
 			'external_id'
 		);
-		$data = json_decode( file_get_contents('php://input') );
 
-		if( !is_array( $data ) )
+
+		if( !is_object( $data ) )
 			return false;
 
-		foreach( $required as $key ) {
-			if( !array_key_exists( $key, $data ) )
-				continue;
-		}
-
 		$id = (int) $data->external_id;
-		add_post_meta( $id, '_clarify_track_id', $this->_validate( $data->track_id, 'hex' ) );
-		add_post_meta( $id, '_clarify_bundle_id', $this-_validate( $date->bundle_id, 'hex' ) );
+		//file_put_contents( ABSPATH . '/log.txt', print_r( $data, true ) );
+		if( $data->track_id )
+			update_post_meta( $id, '_clarify_track_id', $data->track_id );
+		if( $data->bundle_id )
+			update_post_meta( $id, '_clarify_bundle_id',$data->bundle_id );
 	}
 
-	/**
-	 * Simple validation. Leaving it scaffolded for more types
-	 *
-	 * @author Aaron Brazell <aaron@technosailor.com>
-	 * @since 1.0.0
-	 * @param $str
-	 * @param $type
-	 *
-	 * @return bool
-	 */
-	protected function _validate( $str, $type ) {
-		switch( $type ) {
-			case 'hex' :
-				$safe = ( ctype_xdigit( $str ) ) ? true : false;
-				break;
-			default :
-				break;
+	public function is_json( $string ) {
+		$maybe = json_decode( $string );
+		if( is_array( $maybe ) || is_object( $maybe ) ) {
+			return true;
 		}
-		return ( $safe ) ? $str : false;
+
+		return false;
 	}
 }

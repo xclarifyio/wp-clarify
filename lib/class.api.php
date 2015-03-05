@@ -51,33 +51,37 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 		global $clarifyio;
 
 		$enclosure = get_post_meta( $post_id, 'enclosure', true );
+
 		if( !$enclosure )
 			return false;
 
 		$val = explode( "\n", $enclosure );
-
 		// Make sure this is actually an attached WordPress enclosure
 		if( !is_array( $val ) )
 			return false;
 
 		// Make sure the enclosure is among the supported media types
-		$mimetype = $val[2];
+		$mimetype = trim( $val[2] );
 		if( !array_search( $mimetype, $clarifyio->supported_media ) )
 			return false;
 
 		// Extract the valid media url
-		$url = $val[0];
+		$url = trim( $val[0] );
 
 		// Construct the object
 		$payload = array(
-			'media_url'     => esc_url( $url ),
-			'external_id'   => $post_id,
-			'notify_url'    => $this->notify_url
+			'body' => array(
+				'media_url'     => esc_url( $url ),
+				'external_id'   => (string) $post_id,
+				'notify_url'    => $this->notify_url
+			)
 		);
 
-		$args = array_merge( $this->headers, $payload );
+
+		$args = array_merge_recursive( $this->headers, $payload );
 		$request = wp_remote_post( parent::API_BASE . 'bundles', $args );
 		$body = wp_remote_retrieve_body( $request );
+		//echo '<prE>';print_r($request);exit;
 		if( '201' == wp_remote_retrieve_response_code( $request ) )
 			return true;
 
