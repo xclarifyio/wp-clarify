@@ -15,6 +15,7 @@ define( 'CLARIFY_URL',     plugin_dir_url( __FILE__ ) );
 define( 'CLARIFY_PATH',    dirname( __FILE__ ) . '/' );
 
 require_once( CLARIFY_PATH . '/lib/class.api.php' );
+require_once( CLARIFY_PATH . '/lib/class.search.php' );
 require_once( CLARIFY_PATH . '/lib/class.admin.php' );
 require_once( CLARIFY_PATH . '/lib/class.webhooks.php' );
 
