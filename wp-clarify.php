@@ -18,6 +18,7 @@ require_once( CLARIFY_PATH . '/lib/class.api.php' );
 require_once( CLARIFY_PATH . '/lib/class.search.php' );
 require_once( CLARIFY_PATH . '/lib/class.admin.php' );
 require_once( CLARIFY_PATH . '/lib/class.webhooks.php' );
+require_once( CLARIFY_PATH . '/lib/class.player.php' );
 
 register_activation_hook( __FILE__, array( 'Clarify', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Clarify', 'deactivate' ) );
@@ -64,12 +65,40 @@ class Clarify {
 		} );
 
 		add_action( 'publish_post', array( $this, 'save_post' ), 99 );
-
+		//add_action( 'template_redirect', array( $this, 'register_search' ) );
 		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
 		}
 
+		add_filter( 'wp_audio_extensions', function( $types ){
+			$types[] = 'mpeg';
+			$types[] = 'flac';
+			return $types;
+		} );
+
+		add_filter( 'wp_video_extensions', function( $types ) {
+			$types[] = 'mov';
+			return $types;
+		} );
+
+		add_action( 'plugins_loaded', array( $this, 'do_media' ),1 );
+
 	}
+
+	public function do_media() {
+		$players = new Clarify_Players;
+	}
+
+	//public function register_search() {
+
+		//if( !is_search() )
+		//	return true;
+		//global $wp_query;
+		//$term = get_query_var( 's' );
+
+		//$search = new Clarify_Search;
+		//$results = $search->search( $term );
+	//}
 
 	public function admin() {
 		$admin = new Clarify_Admin;
@@ -80,7 +109,7 @@ class Clarify {
 			return false;
 
 		if ( wp_is_post_revision( $post_id ) )
-			return;
+			return false;
 
 		if( 'publish' != get_post_status( $post_id ) )
 			return false;
