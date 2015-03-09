@@ -12,7 +12,6 @@ class Clarify_Search extends Clarify_API_Base {
 		$url = esc_url_raw( parent::API_BASE . 'search?query=' . $term );
 		$response = wp_remote_get( $url, $this->headers );
 		$body = json_decode( wp_remote_retrieve_body( $response ) );
-		echo '<pre>';print_r($body);
-		exit;
+		return $body;
 	}
 }

@@ -47,7 +47,7 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 		return json_decode( $body );
 	}
 
-	public function save_bundle( $post_id ) {
+	public function save_bundle( $post_id, $post ) {
 		global $clarifyio;
 
 		$enclosure = get_post_meta( $post_id, 'enclosure', true );
@@ -80,7 +80,8 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 
 		$args = array_merge_recursive( $this->headers, $payload );
 		$request = wp_remote_post( parent::API_BASE . 'bundles', $args );
-
+		$body = json_decode( wp_remote_retrieve_body( $request ) );
+		//echo '<pre>';print_r($args);echo'</pre>';exit;
 		if( '201' == wp_remote_retrieve_response_code( $request ) )
 			return true;
 

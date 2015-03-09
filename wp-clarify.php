@@ -64,8 +64,8 @@ class Clarify {
 			$webhook->recieve();
 		} );
 
-		add_action( 'publish_post', array( $this, 'save_post' ), 99 );
-		//add_action( 'template_redirect', array( $this, 'register_search' ) );
+		add_action( 'transition_post_status', array( $this, 'save_post' ), 10, 3 );
+		add_action( 'template_redirect', array( $this, 'register_search' ) );
 		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
 		}
@@ -89,29 +89,43 @@ class Clarify {
 		$players = new Clarify_Players;
 	}
 
-	//public function register_search() {
+	public function register_search() {
 
-		//if( !is_search() )
-		//	return true;
-		//global $wp_query;
-		//$term = get_query_var( 's' );
+		if( !is_search() )
+			return true;
 
-		//$search = new Clarify_Search;
-		//$results = $search->search( $term );
-	//}
+		global $wp_query;
+		$term = get_query_var( 's' );
+
+		$search = new Clarify_Search;
+		$results = $search->search( $term );
+
+		$wpids = array();
+		$bundles = array();
+		$items = $results->item_results;
+		foreach( $items as $key => $item ) {
+			$bundle = $results->_links->items[$key]->href;
+			$bundle = explode( '/', $bundle );
+			$bundles[] = end( $bundle );
+		}
+
+		echo '<pre>';print_r($results);exit;
+	}
 
 	public function admin() {
 		$admin = new Clarify_Admin;
 	}
 
-	public function save_post( $post_id ) {
+	public function save_post( $new_status, $old_status, $post ) {
 		if( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
 			return false;
+
+		$post_id = $post->ID;
 
 		if ( wp_is_post_revision( $post_id ) )
 			return false;
 
-		if( 'publish' != get_post_status( $post_id ) )
+		if( 'publish' != $new_status )
 			return false;
 
 		$api = new Clarify_Bundle_API;
