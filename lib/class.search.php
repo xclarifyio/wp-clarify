@@ -2,9 +2,13 @@
 
 class Clarify_Search extends Clarify_API_Base {
 
+	const SEARCH_TRANSIENT_EXPIRY = 3600;
+
 	public $search_term;
 	public $hashes;
 	public $ids;
+
+	public $start;
 
 	public function __construct() {
 		parent::__construct();
@@ -14,52 +18,98 @@ class Clarify_Search extends Clarify_API_Base {
 
 		add_filter( 'the_posts', array( $this, 'search' ) );
 
-		add_filter( 'the_permalink', array( $this, 'search_modify_permalink' ) );
+		add_action( 'wp_head', array( $this, 'extract_start_end_times_from_search' ) );
 
-		add_action( 'init', function() {
-			global $wp;
-			echo '<prE>foo';exit;
-		});
+		add_filter( 'the_content', array( $this, 'wrap_shortcodes' ),1 );
 	}
 
-	public function search_modify_permalink( $url ) {
-		if( !is_search() )
-			return $url;
+	public function wrap_shortcodes( $content ) {
+		global $clarifyio;
+		$term = $this->_from_search();
+		if( !$term )
+			return $content;
 
-		$body = get_transient( 'clarify-search-body-' . get_query_var( 's' ) );
+		$regex   = '#https?:\/\/[www]?.+\.(' . join( '|', $clarifyio->supported_media ) . ')#mi';
+		preg_match_all( $regex, $content, $raw_media);
+		if( empty( $raw_media[0] ) )
+			return $content;
 
-		echo '<pre>';print_r($body);echo'</pre>';
-		return add_query_arg( array( 'foo' => 'bar' ), $url );
+		$medias = $raw_media[0];
+		foreach( $medias as $media ) {
+			$audio_types = wp_get_audio_extensions();
+			$video_types = wp_get_video_extensions();
+
+			$file_info = wp_check_filetype( $media );
+			$ext = $file_info['ext'];
+			if( in_array( $ext, $audio_types ) )
+				$type = 'audio';
+			if( in_array( $ext, $video_types ) )
+				$type = 'video';
+
+			add_filter( 'shortcode_atts_audio', function( $atts ) {
+				$atts['start'] = $this->start;
+				return $atts;
+			});
+		}
+		return $content;
+	}
+
+	public function extract_start_end_times_from_search() {
+
+		$term = $this->_from_search();
+		if( !$term )
+			return false;
+
+		$data = get_transient( 'clarify-search-' . $term );
+		$data = false;
+		if( !$data ) {
+			$data = $this->_api_search( $term );
+		}
+
+		$this->start = (int) round( ( $data->item_results[0]->term_results[0]->matches[0]->hits[0]->start ) - 6 );
+	}
+
+	protected function _from_search() {
+		$referer = wp_get_referer();
+
+		$bits = parse_url( $referer );
+		if( !array_key_exists( 'query', $bits ) )
+			return false;
+
+		parse_str( $bits['query'], $out );
+		if( !array_key_exists( 's', $out ) )
+			return false;
+
+		return $out['s'];
 	}
 
 	public function search( $posts ) {
 		global $wp_query;
 		if( !is_search() )
 			return $posts;
-
 		$posts = $wp_query->posts;
 		$term = get_query_var( 's' );
 
 		$hashes = get_transient( 'clarify-search-' . $term );
-		//$hashes = false;
-		if( !$hashes ) {
-			$url      = esc_url_raw( parent::API_BASE . 'search?query=' . $term );
-			$response = wp_remote_get( $url, $this->headers );
-			$body     = json_decode( wp_remote_retrieve_body( $response ) );
-			//$this->clarify_search = $body;
-			//echo '<pre>';print_r( $body );exit;
 
+		$hashes = false;
+		if( !$hashes ) {
+			$body = $this->_api_search( $term );
+			//$this->clarify_search = $body;
+			$cookie = array();
 			$hashes = array();
-			foreach( $body->_links->items as $item ) {
+			foreach( $body->_links->items as $key => $item ) {
 				$href = $item->href;
 				$bits = explode( '/', $href );
-				$hashes[] = end( $bits );
+				$hash = end( $bits );
+				$hashes[] = $hash;
+
+				$cookie[$hash] = $body->item_results[$key]->term_results[0]->matches[0]->hits[0];
 			}
-			set_transient( 'clarify-search-' . $term, $hashes, 3600 );
-			return $body;
 		}
 
-		$this->hashes = $hashes;
+		$json = wp_json_encode( $cookie );
+		set_transient( 'clarify-search-' . $term, $json, self::SEARCH_TRANSIENT_EXPIRY );
 
 		if( !empty( $hashes ) ) {
 			$mq = query_posts( array(
@@ -86,13 +136,17 @@ class Clarify_Search extends Clarify_API_Base {
 				}
 
 				if( $new ) {
-					add_query_arg( array( 'foo' => 'bar' ), get_permalink($mi->ID) );
-					$mi->clarify = true;
-					$mi->start = 125;
  					$posts[] = $mi;
 				}
 			}
 		}
 		return $posts;
+	}
+
+	protected function _api_search( $term ) {
+		$url      = esc_url_raw( parent::API_BASE . 'search?query=' . $term );
+		$response = wp_remote_get( $url, $this->headers );
+		$body     = json_decode( wp_remote_retrieve_body( $response ) );
+		return $body;
 	}
 }

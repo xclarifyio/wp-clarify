@@ -83,6 +83,10 @@ class Clarify {
 
 		add_action( 'plugins_loaded', array( $this, 'do_media' ),1 );
 
+		add_action( 'wp_enqueue_scripts', function() {
+			wp_enqueue_script( 'jquery' );
+		});
+
 	}
 
 	public function do_media() {
