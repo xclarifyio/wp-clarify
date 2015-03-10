@@ -31,14 +31,14 @@ class Clarify {
 	public function __construct() {
 
 		$this->supported_media = array(
-			'mpeg'  => 'audio/mpeg',
-			'mp3'   => 'audio/mpeg',
-			'wav'   => 'audio/wav',
-			'mp4'   => 'video/mp4',
-			'mov'   => 'video/quicktime',
-			'ogg'   => 'audio/ogg',
-			'flac'  => 'audio/flac',
-			'webm'  => 'video/webm'
+			'mpeg',
+			'mp3',
+			'wav',
+			'mp4',
+			'mov',
+			'ogg',
+			'flac',
+			'webm'
 		);
 		$this->hooks();
 	}
@@ -129,7 +129,7 @@ class Clarify {
 			return false;
 
 		$api = new Clarify_Bundle_API;
-		return $api->save_bundle( $post_id );
+		return $api->save_bundle( $post_id, $post );
 	}
 }
 

@@ -19,6 +19,7 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 		parent::__construct();
 
 		$this->notify_url = site_url( '?clarify_notify_type=bundle' );
+		//$this->notify_url = 'http://api.webhookinbox.com/i/CHYfeNEY/in/';
 	}
 
 	public function get_bundles( $limit = 5, $embed = 'items', $iterator = false ) {
@@ -50,41 +51,44 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 	public function save_bundle( $post_id, $post ) {
 		global $clarifyio;
 
-		$enclosure = get_post_meta( $post_id, 'enclosure', true );
+		$formats = join( '|', $clarifyio->supported_media );
 
-		if( !$enclosure )
-			return false;
+		$bundle_id = get_post_meta( $post_id, '_clarify_bundle_id', true );
+		if( !$bundle_id ) {
+			$regex   = '#https?:\/\/[www]?.+\.(' . $formats . ')#mi';
 
-		$val = explode( "\n", $enclosure );
-		// Make sure this is actually an attached WordPress enclosure
-		if( !is_array( $val ) )
-			return false;
+			preg_match_all( $regex, $post->post_content, $raw_media);
+			if( empty( $raw_media[0] ) )
+				return false;
+			$medias = $raw_media[0];
 
-		// Make sure the enclosure is among the supported media types
-		$mimetype = trim( $val[2] );
-		if( !array_search( $mimetype, $clarifyio->supported_media ) )
-			return false;
+			$payload = array(
+				'body' => array(
+					'external_id' => (string) $post_id,
+					'notify_url'  => $this->notify_url
+				)
+			);
 
-		// Extract the valid media url
-		$url = trim( $val[0] );
+			foreach( $medias as $url ) {
+				$payload[ 'body' ][ 'media_url' ] = $url;
+				$args                             = array_merge_recursive( $this->headers, $payload );
+				$request                          = wp_remote_post( parent::API_BASE . 'bundles', $args );
 
-		// Construct the object
-		$payload = array(
-			'body' => array(
-				'media_url'     => esc_url( $url ),
-				'external_id'   => (string) $post_id,
-				'notify_url'    => $this->notify_url
-			)
-		);
+				if( '201' == wp_remote_retrieve_response_code( $request ) ) {
 
+					$bundle_id_2 = get_post_meta( $post_id, '_clarify_bundle_id', true );
 
-		$args = array_merge_recursive( $this->headers, $payload );
-		$request = wp_remote_post( parent::API_BASE . 'bundles', $args );
-		$body = json_decode( wp_remote_retrieve_body( $request ) );
-		//echo '<pre>';print_r($args);echo'</pre>';exit;
-		if( '201' == wp_remote_retrieve_response_code( $request ) )
-			return true;
+					if( ! $bundle_id_2 ) {
+						wp_remote_post( parent::API_BASE . 'bundles', $args );
+						$bundle_id_3 = get_post_meta( $post_id, '_clarify_bundle_id', true );
+						//echo $bundle_id_3;exit;
+					}
+					continue;
+				}
+				continue;
+			}
+		}
 
-		return false;
+		return true;
 	}
 }

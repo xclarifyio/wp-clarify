@@ -11,6 +11,7 @@ class Clarify_Admin {
 		add_action( 'admin_init', array( $this, 'save' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_action( 'wp_ajax_clarify-bulk', array( $this, 'clarify_bulk' ) );
+		add_action( 'admin_notices', array( $this, 'processing_alert' ) );
 	}
 
 	public function enqueue() {
@@ -27,6 +28,18 @@ class Clarify_Admin {
 
 	public function menu() {
 		add_options_page( __( 'Clarify', 'clarify' ), __( 'Clarify', 'clarify' ), 'manage_options', 'clarify.php', array( $this, 'panel' ), 'dashicons-media-interactive', 30 );
+	}
+
+	public function processing_alert() {
+		global $pagenow;
+		if( 'post.php' != $pagenow )
+			return false;
+
+		if( !get_post_meta( get_the_ID(), '_clarify_bundle_id', true ) ) {
+			echo '<div class="updated"><p>';
+			_e( 'Your media file is still processing with Clarify. When it is complete, it will be available via search.', 'clarify' );
+			echo '</p></div>';
+		}
 	}
 
 	public function panel() {
