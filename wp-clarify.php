@@ -90,20 +90,11 @@ class Clarify {
 	}
 
 	public function register_search() {
-/*
-		if( !is_search() )
-			return true;
-
-		global $wp_query;
-		$term = get_query_var( 's' );
-*/
-		$search = new Clarify_Search;
-		//$results = $search->search( $term );
-		//$wp_query = $results;
+		new Clarify_Search;
 	}
 
 	public function admin() {
-		$admin = new Clarify_Admin;
+		new Clarify_Admin;
 	}
 
 	public function save_post( $new_status, $old_status, $post ) {

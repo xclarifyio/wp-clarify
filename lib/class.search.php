@@ -42,14 +42,6 @@ class Clarify_Search extends Clarify_API_Base {
 
 		$this->hashes = $hashes;
 
-		/*$query = new WP_Query( array(
-			's' => $term,
-			//'post__in' => $ids,
-			)
-		);
-*/
-
-
 		if( !empty( $hashes ) ) {
 			$mq = query_posts( array(
 				'post_type'              => 'any',
@@ -79,7 +71,7 @@ class Clarify_Search extends Clarify_API_Base {
 				}
 			}
 		}
-		
+
 		return $posts;
 	}
 }
