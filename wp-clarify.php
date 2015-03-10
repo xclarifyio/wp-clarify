@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP-Clarify
 Plugin URI: http://github.com
-Verion: 1.0
+Verion: 1.0-beta1
 Author: Aaron Brazell
 Author URI: http://technosailor.com
 Description: Leverages the Clarify API
@@ -115,3 +115,40 @@ class Clarify {
 }
 
 $clarifyio = new Clarify;
+
+add_action( 'init', 'asdf' );
+function asdf() {
+	$labels = array(
+		'name'                => _x( 'Events', 'Post Type General Name', 'asist' ),
+		'singular_name'       => _x( 'Event', 'Post Type Singular Name', 'asist' ),
+		'menu_name'           => __( 'Events', 'asist' ),
+		'parent_item_colon'   => __( 'Parent Event', 'asist' ),
+		'all_items'           => __( 'All events', 'asist' ),
+		'view_item'           => __( 'View Event', 'asist' ),
+		'add_new_item'        => __( 'Add New Event', 'asist' ),
+		'add_new'             => __( 'Add New', 'asist' ),
+		'edit_item'           => __( 'Edit Event', 'asist' ),
+		'update_item'         => __( 'Update Event', 'asist' ),
+		'search_items'        => __( 'Search Events', 'asist' ),
+		'not_found'           => __( 'Not found', 'asist' ),
+		'not_found_in_trash'  => __( 'Not found in Trash', 'asist' ),
+	);
+	$args = array(
+		'label'               => __( 'Events', 'asist' ),
+		'labels'              => $labels,
+		'supports'            => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'events', 'revision' ),
+		'hierarchical'        => true,
+		'public'              => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_nav_menus'   => true,
+		'show_in_admin_bar'   => true,
+		'menu_position'       => 20,
+		'menu_icon'           => 'dashicons-calendar-alt',
+		'can_export'          => true,
+		'has_archive'         => true,
+		'exclude_from_search' => false,
+		'publicly_queryable'  => true,
+	);
+	register_post_type( 'events', $args );
+}
