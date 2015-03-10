@@ -90,26 +90,16 @@ class Clarify {
 	}
 
 	public function register_search() {
-
+/*
 		if( !is_search() )
 			return true;
 
 		global $wp_query;
 		$term = get_query_var( 's' );
-
+*/
 		$search = new Clarify_Search;
-		$results = $search->search( $term );
-
-		$wpids = array();
-		$bundles = array();
-		$items = $results->item_results;
-		foreach( $items as $key => $item ) {
-			$bundle = $results->_links->items[$key]->href;
-			$bundle = explode( '/', $bundle );
-			$bundles[] = end( $bundle );
-		}
-
-		echo '<pre>';print_r($results);exit;
+		//$results = $search->search( $term );
+		//$wp_query = $results;
 	}
 
 	public function admin() {
