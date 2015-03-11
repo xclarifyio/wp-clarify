@@ -65,7 +65,7 @@ class Clarify {
 		} );
 
 		add_action( 'transition_post_status', array( $this, 'save_post' ), 10, 3 );
-		add_action( 'template_redirect', array( $this, 'register_search' ) );
+		add_action( 'init', array( $this, 'register_search' ) );
 		if( is_admin() ) {
 			add_action( 'init', array( $this, 'admin' ) );
 		}

@@ -2,7 +2,7 @@
 
 class Clarify_Search extends Clarify_API_Base {
 
-	const SEARCH_TRANSIENT_EXPIRY = 3600;
+	const SEARCH_TRANSIENT_EXPIRY = 300;
 
 	public $search_term;
 	public $hashes;
@@ -20,10 +20,10 @@ class Clarify_Search extends Clarify_API_Base {
 
 		add_action( 'wp_head', array( $this, 'extract_start_end_times_from_search' ) );
 
-		add_filter( 'the_content', array( $this, 'wrap_shortcodes' ),1 );
+		add_filter( 'the_content', array( $this, 'adjust_start' ),1 );
 	}
 
-	public function wrap_shortcodes( $content ) {
+	public function adjust_start( $content ) {
 		global $clarifyio;
 		$term = $this->_from_search();
 		if( !$term )
@@ -40,13 +40,14 @@ class Clarify_Search extends Clarify_API_Base {
 			$video_types = wp_get_video_extensions();
 
 			$file_info = wp_check_filetype( $media );
+
 			$ext = $file_info['ext'];
 			if( in_array( $ext, $audio_types ) )
 				$type = 'audio';
 			if( in_array( $ext, $video_types ) )
 				$type = 'video';
 
-			add_filter( 'shortcode_atts_audio', function( $atts ) {
+			add_filter( 'shortcode_atts_' . $type, function( $atts ) {
 				$atts['start'] = $this->start;
 				return $atts;
 			});
@@ -79,7 +80,6 @@ class Clarify_Search extends Clarify_API_Base {
 		parse_str( $bits['query'], $out );
 		if( !array_key_exists( 's', $out ) )
 			return false;
-
 		return $out['s'];
 	}
 
@@ -89,27 +89,27 @@ class Clarify_Search extends Clarify_API_Base {
 			return $posts;
 		$posts = $wp_query->posts;
 		$term = get_query_var( 's' );
+		delete_transient( 'clarify-search-' . $term );
+		$body = get_transient( 'clarify-search-' . $term );
 
-		$hashes = get_transient( 'clarify-search-' . $term );
-
-		$hashes = false;
-		if( !$hashes ) {
+		if( !$body ) {
 			$body = $this->_api_search( $term );
-			//$this->clarify_search = $body;
-			$cookie = array();
-			$hashes = array();
-			foreach( $body->_links->items as $key => $item ) {
-				$href = $item->href;
-				$bits = explode( '/', $href );
-				$hash = end( $bits );
-				$hashes[] = $hash;
+			set_transient( 'clarify-search-' . $term, $body, self::SEARCH_TRANSIENT_EXPIRY );
+		}
+		//$this->clarify_search = $body;
+		$cookie = array();
+		$hashes = array();
+		foreach( $body->_links->items as $key => $item ) {
+			$href = $item->href;
+			$bits = explode( '/', $href );
+			$hash = end( $bits );
+			$hashes[] = $hash;
 
-				$cookie[$hash] = $body->item_results[$key]->term_results[0]->matches[0]->hits[0];
-			}
+			$cookie[$hash] = $body->item_results[$key]->term_results[0]->matches[0]->hits[0];
 		}
 
+
 		$json = wp_json_encode( $cookie );
-		set_transient( 'clarify-search-' . $term, $json, self::SEARCH_TRANSIENT_EXPIRY );
 
 		if( !empty( $hashes ) ) {
 			$mq = query_posts( array(
