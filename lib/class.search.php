@@ -26,6 +26,7 @@ class Clarify_Search extends Clarify_API_Base {
 	public function adjust_start( $content ) {
 		global $clarifyio;
 		$term = $this->_from_search();
+		
 		if( !$term )
 			return $content;
 
@@ -71,6 +72,9 @@ class Clarify_Search extends Clarify_API_Base {
 	}
 
 	protected function _from_search() {
+		if( is_search() )
+			return get_query_var( 's' );
+
 		$referer = wp_get_referer();
 
 		$bits = parse_url( $referer );
@@ -87,16 +91,17 @@ class Clarify_Search extends Clarify_API_Base {
 		global $wp_query;
 		if( !is_search() )
 			return $posts;
+
 		$posts = $wp_query->posts;
 		$term = get_query_var( 's' );
-		delete_transient( 'clarify-search-' . $term );
+
 		$body = get_transient( 'clarify-search-' . $term );
 
 		if( !$body ) {
 			$body = $this->_api_search( $term );
 			set_transient( 'clarify-search-' . $term, $body, self::SEARCH_TRANSIENT_EXPIRY );
 		}
-		//$this->clarify_search = $body;
+
 		$cookie = array();
 		$hashes = array();
 		foreach( $body->_links->items as $key => $item ) {
@@ -140,6 +145,8 @@ class Clarify_Search extends Clarify_API_Base {
 				}
 			}
 		}
+		wp_reset_query();
+
 		return $posts;
 	}
 
