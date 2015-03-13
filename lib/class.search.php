@@ -98,7 +98,6 @@ class Clarify_Search extends Clarify_API_Base {
 		$term = get_query_var( 's' );
 
 		$api_results = get_transient( 'clarify-search-' . $term );
-		$api_results = false;
 		if( !$api_results ) {
 			$body = $this->_api_search( $term );
 			$combined_hits = array();
@@ -122,7 +121,7 @@ class Clarify_Search extends Clarify_API_Base {
 				$parts = explode( '/', $href );
 				$bundles[] = end( $parts );
 			}
-			//echo '<pre>';print_r($bundles);print_r($timestamps);exit;
+
 			$api_results = array_combine( $bundles, $timestamps );
 
 			set_transient( 'clarify-search-' . $term, $api_results, self::SEARCH_TRANSIENT_EXPIRY );
