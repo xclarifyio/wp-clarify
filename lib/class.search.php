@@ -18,12 +18,12 @@ class Clarify_Search extends Clarify_API_Base {
 
 		add_filter( 'the_posts', array( $this, 'search' ) );
 
-		add_action( 'wp_head', array( $this, 'extract_start_end_times_from_search' ) );
+		//add_action( 'wp_head', array( $this, 'extract_start_end_times_from_search' ) );
 
-		add_filter( 'the_content', array( $this, 'adjust_start' ),1 );
+		add_filter( 'the_content', array( $this, 'video_content' ),1 );
 	}
 
-	public function adjust_start( $content ) {
+	public function video_content( $content ) {
 		global $clarifyio;
 		$term = $this->_from_search();
 		
@@ -68,6 +68,8 @@ class Clarify_Search extends Clarify_API_Base {
 			$data = $this->_api_search( $term );
 		}
 
+		echo '<pre>';print_r( $data );exit;
+
 		$this->start = (int) round( ( $data->item_results[0]->term_results[0]->matches[0]->hits[0]->start ) - 6 );
 	}
 
@@ -95,26 +97,41 @@ class Clarify_Search extends Clarify_API_Base {
 		$posts = $wp_query->posts;
 		$term = get_query_var( 's' );
 
-		$body = get_transient( 'clarify-search-' . $term );
-
-		if( !$body ) {
+		$api_results = get_transient( 'clarify-search-' . $term );
+		$api_results = false;
+		if( !$api_results ) {
 			$body = $this->_api_search( $term );
-			set_transient( 'clarify-search-' . $term, $body, self::SEARCH_TRANSIENT_EXPIRY );
+			$combined_hits = array();
+			foreach( $body->item_results as $result ) {
+				$time = array();
+				$matches = $result->term_results[0]->matches;
+				$term_hits = array();
+				foreach( $matches as $match ) {
+					$hits = $match->hits;
+					foreach( $hits as $hit ) {
+						$term_hits[] = $hit;
+					}
+					$combined_hits = $term_hits;
+				}
+				$timestamps[] = $combined_hits;
+			}
+
+			$bundles = array();
+			foreach( $body->_links->items as $item ) {
+				$href = $item->href;
+				$parts = explode( '/', $href );
+				$bundles[] = end( $parts );
+			}
+			//echo '<pre>';print_r($bundles);print_r($timestamps);exit;
+			$api_results = array_combine( $bundles, $timestamps );
+
+			set_transient( 'clarify-search-' . $term, $api_results, self::SEARCH_TRANSIENT_EXPIRY );
 		}
 
-		$cookie = array();
 		$hashes = array();
-		foreach( $body->_links->items as $key => $item ) {
-			$href = $item->href;
-			$bits = explode( '/', $href );
-			$hash = end( $bits );
-			$hashes[] = $hash;
-
-			$cookie[$hash] = $body->item_results[$key]->term_results[0]->matches[0]->hits[0];
+		foreach( $api_results as $key => $item ) {
+			$hashes[] = $key;
 		}
-
-
-		$json = wp_json_encode( $cookie );
 
 		if( !empty( $hashes ) ) {
 			$mq = query_posts( array(

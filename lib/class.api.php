@@ -19,7 +19,6 @@ class Clarify_Bundle_API extends Clarify_API_Base {
 		parent::__construct();
 
 		$this->notify_url = site_url( '?clarify_notify_type=bundle' );
-		//$this->notify_url = 'http://api.webhookinbox.com/i/CHYfeNEY/in/';
 	}
 
 	public function get_bundles( $limit = 5, $embed = 'items', $iterator = false ) {
