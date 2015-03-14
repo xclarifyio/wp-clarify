@@ -1,18 +1,55 @@
 <?php
 
+/**
+ * Handles the implementation of Clarify results with native WordPress media embeds
+ *
+ * @since 1.0.0
+ * @access public
+ * @author Aaron Brazell <aaron@technosailor.com>
+ */
 class Clarify_Players {
 
+	/**
+	 * Constructor
+	 *
+	 * @since 1.0.0
+	 *
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public function __construct() {
 		$this->hooks();
 	}
 
+	/**
+	 * Hooks methods into WordPress
+	 *
+	 * @since 1.0.0
+	 *
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public function hooks() {
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue' ) );
 		add_filter( 'wp_audio_shortcode', array( $this, 'add_start_time' ), 10, 5 );
 		add_filter( 'wp_video_shortcode', array( $this, 'add_start_time' ), 10, 5 );
 	}
 
-	public function add_start_time( $html, $atts, $audio, $post_id, $library ) {
+	/**
+	 * A filter for media shortcodes that adds timestamp results and switcher to media embeds
+	 * @since 1.0.0
+	 *
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @see `wp_audio_shortcode` filter
+	 * @see `wp_video_shortcode` filter
+	 * @link https://core.trac.wordpress.org/browser/tags/4.1.1/src/wp-includes/media.php#L1646
+	 *
+	 * @param $html string The HTML source of the embed
+	 * @param $atts array The shortcode attributes
+	 * @param $media_element The media URL
+	 * @param $post_id The post ID of the content
+	 * @param $library The player JS library used. Default `mediaelement`
+	 *
+	 * @return string The modified HTML source for the embed
+	 */
+	public function add_start_time( $html, $atts, $media_element, $post_id, $library ) {
 
 		$search = new Clarify_Search;
 		$term = $search->_from_search();
@@ -30,49 +67,11 @@ class Clarify_Players {
 
 		$this_timestamps = $api_results[$this_post_bundle];
 
-		/*
-		 * Array
-(
-    [0] => stdClass Object
-        (
-            [start] => 673.73
-            [end] => 674.13
-        )
-
-    [1] => stdClass Object
-        (
-            [start] => 676.31
-            [end] => 676.6
-        )
-
-    [2] => stdClass Object
-        (
-            [start] => 678.74
-            [end] => 679.09
-        )
-
-    [3] => stdClass Object
-        (
-            [start] => 723.36
-            [end] => 723.78
-        )
-
-    [4] => stdClass Object
-        (
-            [start] => 745.02
-            [end] => 745.37
-        )
-
-)
-		 */
-
 		preg_match( '#id="((audio|video)?-\d+-\d+)"#', $html, $dom );
 
 		if( !isset( $dom[1] )  )
 			return $html;
 		$dom_id = esc_js( $dom[1] );
-		// Because JS is stupid and interprets - in DOM IDs as subtraction
-		//$_dom_id = str_replace( '-', '_', $dom_id );
 
 		$script = <<<SCRIPT_TAG
 		<script>
@@ -81,7 +80,7 @@ class Clarify_Players {
 
 			var media  = document.getElementById('$dom_id');
 			var src = media.currentSrc;
-			
+
 			$('.clarify-seek-handle').on('click', function(ev){
 				var timestamp = $(this).data('timestamp');
 
@@ -93,6 +92,22 @@ class Clarify_Players {
 		});
 		</script>
 SCRIPT_TAG;
+
+		/**
+		 * Filter to modify Clarify included Javascript
+		 *
+		 * Allows plugin developers to modify the Clarify-generated Javascript. Useful for things like implementing custom JS. Please ensure proper sanitization and security practices
+		 *
+		 * @since 1.0.0
+		 * @author Aaron Brazell <aaron@technosailor.com>
+		 *
+		 * @param string $script The Clarify-generated Javascript
+		 */
+		$script = apply_filters( 'clarify_embed_js', $script );
+
+		// Trust NO ONE. A rogue plugin developer could filter our JS and introduce potentially unsafe JS/XSS vulnerabilities.
+		$script = esc_js( $script );
+
 		$handles = '<ul class="clarify-seek-handles">';
 		$iterator = 1;
 		foreach( $this_timestamps as $timestamp ) {
@@ -102,9 +117,17 @@ SCRIPT_TAG;
 		}
 		$handles .= '</ul>';
 		$html = $html . $script . $handles;
-		return $html;
-	}
-	public function enqueue() {
-		wp_register_script( 'clarify-player', CLARIFY_URL . '/js/clarify.js', array( 'jquery' ) );
+
+		/**
+		 * Filter to modify Clarify HTML structure
+		 *
+		 * Allows plugin developers to modify the Clarify-generated HTML. Useful for things like changing DOM structure or adding additional elements
+		 *
+		 * @since 1.0.0
+		 * @author Aaron Brazell <aaron@technosailor.com>
+		 *
+		 * @param string $html The Clarify-generated HTML
+		 */
+		return apply_filters( 'clarify_embed_html', $html );
 	}
 }

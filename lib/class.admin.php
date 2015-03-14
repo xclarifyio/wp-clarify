@@ -1,19 +1,45 @@
 <?php
 
+/**
+ * Class for Admin UI Elements
+ *
+ * @since 1.0.0
+ * @access public
+ * @author Aaron Brazell <aaron@technosailor.com>
+ */
 class Clarify_Admin {
 
+	/**
+	 * Constructor
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public function __construct() {
 		$this->hooks();
 	}
 
+	/**
+	 * Hooks methods into WordPress
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public function hooks() {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_init', array( $this, 'save' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-		add_action( 'wp_ajax_clarify-bulk', array( $this, 'clarify_bulk' ) );
 		add_action( 'admin_notices', array( $this, 'processing_alert' ) );
 	}
 
+	/**
+	 * Enqueues Javascript
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @see `admin_enqueue_scripts`
+	 */
 	public function enqueue() {
 		wp_register_script( 'clarify-admin', CLARIFY_URL . 'js/admin.js', array( 'jquery' ) );
 		wp_localize_script( 'clarify-admin', 'clarify_ajax', array(
@@ -26,10 +52,28 @@ class Clarify_Admin {
 		wp_enqueue_script( 'clarify-admin' );
 	}
 
+	/**
+	 * Hooks in a new Clarify menu
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @see `admin_menu`
+	 */
 	public function menu() {
 		add_options_page( __( 'Clarify', 'clarify' ), __( 'Clarify', 'clarify' ), 'manage_options', 'clarify.php', array( $this, 'panel' ), 'dashicons-media-interactive', 30 );
 	}
 
+	/**
+	 * Notification method for display while media is being analyzed.
+	 *
+	 * Notifies users that the video is being processed by Clarify. After Clarify calls back, the postmeta _clarify_bundle_id is created and the message goes away
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @see `admin_notices`
+	 *
+	 * @return bool
+	 */
 	public function processing_alert() {
 		global $pagenow;
 		if( 'post.php' != $pagenow )
@@ -42,6 +86,14 @@ class Clarify_Admin {
 		}
 	}
 
+	/**
+	 * HTML for admin panel generation
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 *
+	 * @return void
+	 */
 	public function panel() {
 
 		global $clarifyio;
@@ -63,24 +115,31 @@ class Clarify_Admin {
 				</tr>
 			</table>
 				<?php
+
+				/**
+				 * Allows plugin developers to add additional Clarify settings
+				 *
+				 * @since 1.0.0
+				 * @author Aaron Brazell <aaron@technosailor.com>
+				 */
+				do_action( 'clarify_admin_settings' );
+
 				wp_nonce_field( 'clarify_save', 'clarify_save' );
 				submit_button( __( 'Save', 'clarify' ), 'primary' );
 				?>
 			</form>
 		<?php
-		if( $ak ) {
-			?>
-			<hr />
-			<h2><?php _e( 'Scan for Media', 'clarify' ) ?></h2>
-			<p><?php _e( 'By clicking the button below, Clarify will scann all of your published content for supported media, and upload them to the Clarify service. <b>This may take some time. Please do not navigate away from this page.</b>', 'clarify' ) ?></p>
-			<p><?php printf( __( 'We support the following media types:', 'clarify' ) . ' <b>%s</b>', implode( ', ', $clarifyio->supported_media ) ) ?></p>
-			<input type="button" id="clarify-bulk-media" class="button" value="<?php _e( 'Scan Now', 'clarify' ) ?>" />
-			<div id="bulk_result"></div>
-			</div>
-		<?php
-		}
 	}
 
+	/**
+	 * Saves Clarify settings
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @see `admin_init`
+	 *
+	 * @return bool
+	 */
 	public function save() {
 		if( !array_key_exists( 'clarify_save', $_POST ) )
 			return false;

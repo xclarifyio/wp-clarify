@@ -1,24 +1,65 @@
 <?php
 
+/**
+ * Extends the base API class and performs searches against the Clarify API
+ *
+ * @extends Clarify_API_Base
+ * @since 1.0.0
+ * @access public
+ * @author Aaron Brazell <aaron@technosailor.com>
+ */
 class Clarify_Search extends Clarify_API_Base {
 
+	/**
+	 * Defines the number of seconds to store transient search data ion seconds. 300 = 5 minutes
+	 *
+	 * @const SEARCH_TRANSIENT_EXPIRY Number of seconds to store search data as a transient
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	const SEARCH_TRANSIENT_EXPIRY = 300;
 
+	/**
+	 * @var string Makes the search term available to the whole class
+	 * @since 1.0.0
+	 * @access public
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public $search_term;
+
+	/**
+	 * @var array makes the hashes of each bundle available to the entire class
+	 * @since 1.0.0
+	 * @access public
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public $hashes;
-	public $ids;
 
-	public $start;
-
+	/**
+	 * Constructor
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 */
 	public function __construct() {
 		parent::__construct();
 
 		$this->hashes = false;
-		$this->ids = false;
 
 		add_filter( 'the_posts', array( $this, 'search' ) );
 	}
 
+	/**
+	 * Helper method to determine if the page is a result of a search query
+	 *
+	 * @since 1.0.0
+	 * @access public
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @uses wp_get_referer()
+	 *
+	 * @return bool|string Returns false if we are not coming from search, or the search term if we are
+	 */
 	public function _from_search() {
 		if( is_search() )
 			return get_query_var( 's' );
@@ -35,6 +76,17 @@ class Clarify_Search extends Clarify_API_Base {
 		return $out['s'];
 	}
 
+	/**
+	 * Performs an API/transient search and combines the results with the standard WP search post objects into a standard set of post objects
+	 * @param $posts A list of standard post objects generated from a standard WP Search query
+	 *
+	 * @since 1.0.0
+	 * @author Aaron Brazell <aaron@technosailor.com>
+	 * @access public
+	 * @see `the_posts` filter
+	 *
+	 * @return array
+	 */
 	public function search( $posts ) {
 		global $wp_query;
 		if( !is_search() )
@@ -68,6 +120,9 @@ class Clarify_Search extends Clarify_API_Base {
 				$bundles[] = end( $parts );
 			}
 
+			if( !isset( $timestamps ) || !is_array( $timestamps ) )
+				$timestamps = array();
+
 			$api_results = array_combine( $bundles, $timestamps );
 
 			set_transient( 'clarify-search-' . $term, $api_results, self::SEARCH_TRANSIENT_EXPIRY );
@@ -79,11 +134,32 @@ class Clarify_Search extends Clarify_API_Base {
 		}
 
 		if( !empty( $hashes ) ) {
-			$mq = query_posts( array(
+
+			/**
+			 * Filter to modify query args
+			 *
+			 * Allows plugin developers to modify default query used in searching WP for Clarify embeds. Most obvious one is `posts_per_page`
+			 *
+			 * @since 1.0.0
+			 * @author Aaron Brazell <aaron@technosailor.com>
+			 *
+			 * @param array $filterable_args {
+			 *      WP_Query args used for search results from WordPress
+			 *
+			 *      @type string post_type. Default 'any'
+			 *      @type boolean no_found_rows Useful for performance. Default false
+			 *      @type boolean update_post_term_cache Useful for performance when we are not performing taxonomy queries. Default false
+			 *      @type int posts_per_page Number of results to return. Default 100
+			 * }
+			 */
+			$filterable_args = apply_filters( 'clarify_filterable_search_args', array(
 				'post_type'              => 'any',
 				'no_found_rows'          => false,
 				'update_post_term_cache' => false,
 				'posts_per_page'         => 100,
+			) );
+
+			$args = array_merge( $filterable_args, array(
 				'meta_query'             => array(
 					array(
 						'key'     => '_clarify_bundle_id',
@@ -92,6 +168,7 @@ class Clarify_Search extends Clarify_API_Base {
 					)
 				)
 			) );
+			$mq = query_posts( $args );
 
 			foreach( $mq as $mi ) {
 
