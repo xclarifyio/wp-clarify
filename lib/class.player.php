@@ -75,7 +75,6 @@ class Clarify_Players {
 
 		$script = <<<SCRIPT_TAG
 		<script>
-
 		jQuery(document).ready(function($){
 
 			var media  = document.getElementById('$dom_id');
@@ -106,7 +105,6 @@ SCRIPT_TAG;
 		$script = apply_filters( 'clarify_embed_js', $script );
 
 		// Trust NO ONE. A rogue plugin developer could filter our JS and introduce potentially unsafe JS/XSS vulnerabilities.
-		$script = esc_js( $script );
 
 		$handles = '<ul class="clarify-seek-handles">';
 		$iterator = 1;
