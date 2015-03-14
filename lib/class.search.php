@@ -17,63 +17,9 @@ class Clarify_Search extends Clarify_API_Base {
 		$this->ids = false;
 
 		add_filter( 'the_posts', array( $this, 'search' ) );
-
-		//add_action( 'wp_head', array( $this, 'extract_start_end_times_from_search' ) );
-
-		add_filter( 'the_content', array( $this, 'video_content' ),1 );
 	}
 
-	public function video_content( $content ) {
-		global $clarifyio;
-		$term = $this->_from_search();
-		
-		if( !$term )
-			return $content;
-
-		$regex   = '#https?:\/\/[www]?.+\.(' . join( '|', $clarifyio->supported_media ) . ')#mi';
-		preg_match_all( $regex, $content, $raw_media);
-		if( empty( $raw_media[0] ) )
-			return $content;
-
-		$medias = $raw_media[0];
-		foreach( $medias as $media ) {
-			$audio_types = wp_get_audio_extensions();
-			$video_types = wp_get_video_extensions();
-
-			$file_info = wp_check_filetype( $media );
-
-			$ext = $file_info['ext'];
-			if( in_array( $ext, $audio_types ) )
-				$type = 'audio';
-			if( in_array( $ext, $video_types ) )
-				$type = 'video';
-
-			add_filter( 'shortcode_atts_' . $type, function( $atts ) {
-				$atts['start'] = $this->start;
-				return $atts;
-			});
-		}
-		return $content;
-	}
-
-	public function extract_start_end_times_from_search() {
-
-		$term = $this->_from_search();
-		if( !$term )
-			return false;
-
-		$data = get_transient( 'clarify-search-' . $term );
-		$data = false;
-		if( !$data ) {
-			$data = $this->_api_search( $term );
-		}
-
-		echo '<pre>';print_r( $data );exit;
-
-		$this->start = (int) round( ( $data->item_results[0]->term_results[0]->matches[0]->hits[0]->start ) - 6 );
-	}
-
-	protected function _from_search() {
+	public function _from_search() {
 		if( is_search() )
 			return get_query_var( 's' );
 
