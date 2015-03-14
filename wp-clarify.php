@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP-Clarify
 Plugin URI: http://github.com
-Verion: 1.0-beta3
+Verion: 1.0-beta4
 Author: Aaron Brazell
 Author URI: http://technosailor.com
 Description: Leverages the Clarify API
