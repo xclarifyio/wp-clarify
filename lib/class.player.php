@@ -65,7 +65,7 @@ class Clarify_Players {
 		if( !array_key_exists( $this_post_bundle, $api_results ) )
 			return $html;
 
-		$this_timestamps = $api_results[$this_post_bundle];
+		$timestamps = $api_results[$this_post_bundle];
 
 		preg_match( '#id="((audio|video)?-\d+-\d+)"#', $html, $dom );
 
@@ -108,12 +108,13 @@ SCRIPT_TAG;
 
 		$handles = '<ul class="clarify-seek-handles">';
 		$iterator = 1;
-		foreach( $this_timestamps as $timestamp ) {
+		foreach( $timestamps as $timestamp ) {
 			$start = round( $timestamp->start - 2 );
 			$handles .= '<li>' . sprintf( __( 'Mention', 'clarify' ) . ' %d: %s', $iterator, '<a class="clarify-seek-handle" href="#" data-timestamp="' . $start . '">' . $start . ' seconds</a>' ) . '</li>';
 			$iterator++;
 		}
 		$handles .= '</ul>';
+		$handles = apply_filters( 'clarify_results_html', $handles, $timestamps );
 		$html = $html . $script . $handles;
 
 		/**
