@@ -102,6 +102,11 @@ class Clarify_Admin {
 		?>
 		<div class="wrap">
 			<h2><?php _e( 'Clarify Options', 'clarify' ) ?></h2>
+            <p>This plugin allows you to integrate Clarify's audio and video search capabilities directly into your on-site search.</p>
+            <p>After you put an API key in below, any audio or video files you embed in posts will automatically be indexed through
+                Clarify. Then when a visitor uses your on-site search, WordPress will automatically search the body of your post <em>and</em>
+                the content of the audio and video with Clarify. This plugin will handle combining the results and letting the visitor
+                jump directly to the parts they're looking for.</p>
 			<form action="" method="post">
 			<table class="form-table">
 				<tr>
