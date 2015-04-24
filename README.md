@@ -24,7 +24,13 @@ The Clarify plugin allows you to make any audio or video embedded in your posts,
 
 ## Usage
 
-Now whenever you add a URL to your audio or video file, it will automatically be sent to Clarify for indexing. Once the file is done processing, using your on-site search will return results describing where your word is heard in the audio down to the second. If you're using the default embed/shortcode, these mentions will be clickable and jump you directly to that spot in the audio or video.
+Now whenever you add a URL to your audio or video file - either by directly copy/pasting the url into the post or using a media embed - it will automatically be sent to Clarify for indexing.
+
+Once the file is done processing, using your on-site search will return results describing where your word is heard in the audio down to the second. If you're using the default embed/shortcode, these mentions will be clickable and jump you directly to that spot in the audio or video.
+
+### Further Usage
+
+If you have archives with media - audio or video - already embedded, this plugin will not automatically index it for you. We didn't want to surprise you with a massive bill. Instead, just open any of your old posts and re-save them. No editing or changes required. The media will get processed just like any other media.
 
 ## Changelog
 
