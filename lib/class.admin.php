@@ -80,8 +80,8 @@ class Clarify_Admin {
             return false;
 
         if( !get_post_meta( get_the_ID(), '_clarify_bundle_id', true ) ) {
-            echo '<div class="updated"><p>';
-            _e( 'Your media file is still processing with Clarify. When it is complete, it will be available via search.', 'clarify' );
+            echo '<div class="error"><p>';
+            _e( 'Your media file is still processing with Clarify. When it is complete, it will be available via search. On average, it will take about 1 minute for every minute of media. An hour long podcast will take about an hour on our end.', 'clarify' );
             echo '</p></div>';
         }
     }
