@@ -30,7 +30,7 @@ class Clarify_Admin {
         add_action( 'admin_menu', array( $this, 'menu' ) );
         add_action( 'admin_init', array( $this, 'save' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
-        add_action( 'admin_notices', array( $this, 'processing_alert' ) );
+        add_action( 'add_meta_boxes', array( $this, 'processing_alert' ),1 );
     }
 
     /**
@@ -61,29 +61,6 @@ class Clarify_Admin {
      */
     public function menu() {
         add_options_page( __( 'Clarify', 'clarify' ), __( 'Clarify', 'clarify' ), 'manage_options', 'clarify.php', array( $this, 'panel' ), 'dashicons-media-interactive', 30 );
-    }
-
-    /**
-     * Notification method for display while media is being analyzed.
-     *
-     * Notifies users that the video is being processed by Clarify. After Clarify calls back, the postmeta _clarify_bundle_id is created and the message goes away
-     *
-     * @since 1.0.0
-     * @author Aaron Brazell <aaron@technosailor.com>
-     * @see `admin_notices`
-     *
-     * @return bool
-     */
-    public function processing_alert() {
-        global $pagenow;
-        if( 'post.php' != $pagenow )
-            return false;
-
-        if( !get_post_meta( get_the_ID(), '_clarify_bundle_id', true ) ) {
-            echo '<div class="error"><p>';
-            _e( 'Your media file is still processing with Clarify. When it is complete, it will be available via search. On average, it will take about 1 minute for every minute of media. An hour long podcast will take about an hour on our end.', 'clarify' );
-            echo '</p></div>';
-        }
     }
 
     /**
@@ -153,5 +130,50 @@ class Clarify_Admin {
             return false;
 
         update_option( 'clarify_apikey', $_POST['api_key'] );
+    }
+
+    /**
+     * Notification method for display while media is being analyzed.
+     *
+     * Notifies users that the video is being processed by Clarify. After Clarify calls back, the postmeta _clarify_bundle_id is created and the message goes away
+     *
+     * @uses Clarify_Bundle_API
+     * @author Keith Casey <support@clarify.io>
+     * @since 1.0.0
+     */
+    public function processing_alert($post_type)
+    {
+        global $pagenow;
+
+        $post_types = array('post', 'page');     //limit meta box to certain post types
+        if ( in_array( $post_type, $post_types ) && $pagenow != 'post-new.php') {
+            add_meta_box(
+                'some_meta_box_name'
+                ,__( 'Clarify: Indexing Status', 'clarify' )
+                ,array( $this, 'render_meta_box_content' )
+                ,$post_type
+                ,'advanced'
+                ,'high'
+            );
+        }
+    }
+
+    /**
+     * Render Meta Box content.
+     *
+     * @param WP_Post $post The post object.
+     */
+    public function render_meta_box_content( $post )
+    {
+        $key = get_post_meta( get_the_ID(), '_clarify_bundle_id', true );
+        $enclosure = get_post_meta( get_the_ID(), 'enclosure', true );
+
+        if (strlen($key) > 0 ) {
+            _e( 'This media is indexed with Clarify.', 'clarify' );
+        } else {
+            if (strlen($enclosure) > 0) {
+                _e( 'Your media file is still processing with Clarify. When it is complete, it will be available via search. On average, it will take about 1 minute for every minute of media. An hour long podcast will take about an hour to process.', 'clarify' );
+            }
+        }
     }
 }
