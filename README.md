@@ -4,11 +4,11 @@ Contributors:       Aaron Brazell; Clarify, Inc
 
 Tags:               audio search, video search, podcasts, videocasts, video blogging
 
-Requires at least:  ?
+Requires at least:  2.5
 
 Tested up to:       4.1.1
 
-Stable Tag:         ?
+Stable Tag:         1.0
 
 The Clarify plugin allows you to make any audio or video embedded in your posts, pages, etc searchable via the standard WordPress search box. No additional plugins are necessary. It is powered by Clarify's automatic speech recognition technology.
 
