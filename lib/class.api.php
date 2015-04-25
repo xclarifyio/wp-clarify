@@ -159,16 +159,6 @@ class Clarify_Bundle_API extends Clarify_API_Base {
                 $args                             = array_merge_recursive( $this->headers, $payload );
                 $request                          = wp_remote_post( parent::API_BASE . 'bundles', $args );
 
-//				if( '201' == wp_remote_retrieve_response_code( $request ) ) {
-//
-//					$bundle_id_2 = get_post_meta( $post_id, '_clarify_bundle_id', true );
-//
-//					if( ! $bundle_id_2 ) {
-//						wp_remote_post( parent::API_BASE . 'bundles', $args );
-//						$bundle_id_3 = get_post_meta( $post_id, '_clarify_bundle_id', true );
-//					}
-//					continue;
-//				}
                 continue;
             }
         }
