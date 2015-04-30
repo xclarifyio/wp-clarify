@@ -4,7 +4,7 @@ Contributors:       Aaron Brazell; Clarify, Inc
 
 Tags:               audio search, video search, podcasts, videocasts, video blogging, clarify
 
-Requires at least:  ?
+Requires at least:  2.5
 
 Tested up to:       4.1.1
 
@@ -38,3 +38,7 @@ If you have archives with media - audio or video - already embedded, this plugin
 
 ### 1.0-RC1
 *  This is the first candidate release that we're sharing with trusted beta testers.
+
+## Housekeeping
+
+While Github is the definitive location for all development on this plugin, it is also hosted in WordPress' SVN repository to make it available in the Plugin Directory. Instructions on synchronizing repositories are here: http://ben.lobaugh.net/blog/147853/creating-a-two-way-sync-between-a-github-repository-and-subversion
