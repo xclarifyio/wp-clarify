@@ -1,0 +1,22 @@
+{
+    "name": "Clarify/wp-clarify",
+    "version": "1.0",
+    "description": "A WordPress plugin to make podcasts and video blogs searchable using the Clarify API.",
+    "keywords": ["api", "audio search", "video search", "podcast search", "podcasters", "video blogging", "clarify", "clarify.io"],
+    "homepage": "https://github.com/Clarify/wp-clarify",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aaron Brazell",
+            "email": "aaron@technosailor.com"
+        },
+        {
+            "name": "Keith Casey",
+            "email": "support@clarify.io"
+        }
+    ],
+    "type": "wordpress-plugin",
+    "minimum-stability": "dev",
+    "require-dev": {},
+    "require": {},
+}
