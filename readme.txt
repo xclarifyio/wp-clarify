@@ -4,7 +4,7 @@ Contributors:       Aaron Brazell; Clarify, Inc
 
 Tags:               audio search, video search, podcasts, videocasts, video blogging, clarify
 
-Requires at least:  ?
+Requires at least:  2.5
 
 Tested up to:       4.1.1
 
