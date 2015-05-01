@@ -1,4 +1,4 @@
-# WP-Clarify
+== Podcast Searcher by Clarify ==
 
 Contributors:       Aaron Brazell; Clarify, Inc
 
@@ -8,23 +8,23 @@ Requires at least:  2.5
 
 Tested up to:       4.1.1
 
-Stable Tag:         ?
+Stable Tag:         1.0
 
 License:            MIT
 
 The Clarify plugin allows you to make any audio or video embedded in your posts, pages, etc searchable via the standard WordPress search box.
 
-## Description
+== Description ==
 
 [Clarify](http://Clarify.io) is an API that makes audio and video searchable. It uses automatic speech recognition to extract spoken English, Spanish, and French and lets you retrieve detailed information about your media with simple API calls. Once you [sign up for an account](https://developer.clarify.io/accounts/signup/), you add your API key to the settings and the rest is handled automatically.
 
-## Installation
+== Installation ==
 
 1. Download the wp-clarify.zip file from Github
 1. Visit Plugins > Add New > Upload Plugin and upload the zip file
 1. Under Settings > Clarify add your API key available from the [Developer Portal](https://developer.clarify.io/apps/list/)
 
-## Usage
+== Usage ==
 
 Now whenever you add a URL to your audio or video file - either by directly copy/pasting the url into the post or using a media embed - it will automatically be sent to Clarify for indexing.
 
