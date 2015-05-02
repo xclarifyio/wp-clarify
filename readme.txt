@@ -1,6 +1,6 @@
 == Podcast Searcher by Clarify ==
 
-Contributors:       Aaron Brazell; Clarify, Inc
+Contributors:       Aaron Brazell, Clarify Inc
 
 Tags:               audio search, video search, podcasts, videocasts, video blogging, clarify
 
@@ -8,7 +8,7 @@ Requires at least:  2.5
 
 Tested up to:       4.1.1
 
-Stable Tag:         1.0
+Stable Tag:         1.0.0
 
 License:            MIT
 
@@ -30,13 +30,16 @@ Now whenever you add a URL to your audio or video file - either by directly copy
 
 Once the file is done processing, using your on-site search will return results describing where your word is heard in the audio down to the second. If you're using the default embed/shortcode, these mentions will be clickable and jump you directly to that spot in the audio or video.
 
-### Further Usage
+=== Further Usage ===
 
 If you have archives with media - audio or video - already embedded, this plugin will not automatically index it for you. We didn't want to surprise you with a massive bill. Instead, just open any of your old posts and re-save them. No editing or changes required. The media will get processed just like any other media.
 
-## Changelog
+== Changelog ==
 
-### 1.0-RC1
+=== 1.0.0 ===
+*  This is the first formal release.
+
+=== 1.0-RC1 ===
 *  This is the first candidate release that we're sharing with trusted beta testers.
 
 ## Housekeeping
