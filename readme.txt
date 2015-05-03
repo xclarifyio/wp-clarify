@@ -16,13 +16,13 @@ The Clarify plugin allows you to make any audio or video embedded in your posts,
 
 == Description ==
 
-[Clarify](http://Clarify.io) is an API that makes audio and video searchable. It uses automatic speech recognition to extract spoken English, Spanish, and French and lets you retrieve detailed information about your media with simple API calls. Once you [sign up for an account](https://developer.clarify.io/accounts/signup/), you add your API key to the settings and the rest is handled automatically.
+Clarify - http://Clarify.io - is an API that makes audio and video searchable. It uses automatic speech recognition to extract spoken English, Spanish, and French and lets you retrieve detailed information about your media with simple API calls. Once you [sign up for an account](https://developer.clarify.io/accounts/signup/), you add your API key to the settings and the rest is handled automatically.
 
 == Installation ==
 
 1. Download the wp-clarify.zip file from Github
 1. Visit Plugins > Add New > Upload Plugin and upload the zip file
-1. Under Settings > Clarify add your API key available from the [Developer Portal](https://developer.clarify.io/apps/list/)
+1. Under Settings > Clarify add your API key available from the Developer Portal: https://developer.clarify.io/apps/list/
 
 == Usage ==
 
@@ -44,4 +44,4 @@ If you have archives with media - audio or video - already embedded, this plugin
 
 ## Housekeeping
 
-While Github is the definitive location for all development on this plugin, it is also hosted in WordPress' SVN repository to make it available in the Plugin Directory. Instructions on synchronizing repositories are here: http://ben.lobaugh.net/blog/147853/creating-a-two-way-sync-between-a-github-repository-and-subversion
+While this is hosted in WordPress' SVN repository, no development is performed there. For the latest and greatest development version, check out the Github repository: https://github.com/Clarify/wp-clarify
