@@ -1,17 +1,4 @@
 <?php
-/*
-Plugin Name: WP-Clarify
-Plugin URI: http://github.com/Clarify/wp-clarify
-Version: 1.0-RC1
-Author: Aaron Brazell
-Author URI: http://technosailor.com
-Maintainer: Clarify, Inc
-Maintainer URI: http://Clarify.io
-Description: Makes embedded podcasts and videocasts searchable within the on-site search. Powered by via the Clarify API at <a href="http://Clarify.io">Clarify.io</a>
-License: MIT
-License URI: https://github.com/Clarify/wp-clarify/blob/master/LICENSE
-*/
-
 
 /**
  * Clarify version of plugin
