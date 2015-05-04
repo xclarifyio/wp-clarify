@@ -1,4 +1,17 @@
 <?php
+/*
+Plugin Name: WP-Clarify
+Plugin URI: http://github.com/Clarify/wp-clarify
+Version: 1.0.1
+Author: Aaron Brazell
+Author URI: http://technosailor.com
+Maintainer: Clarify, Inc
+Maintainer URI: http://Clarify.io
+Description: The <a href="http://Clarify.io">Clarify</a> plugin allows you to make any audio or video embedded in your posts, pages, etc searchable via the standard WordPress search box.
+License: MIT
+License URI: https://github.com/Clarify/wp-clarify/blob/master/LICENSE
+*/
+
 
 /**
  * Clarify version of plugin
