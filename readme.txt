@@ -4,7 +4,7 @@ Contributors:       technosailor, caseysoftware
 Tags:               audio search, video search, podcasts, videocasts, video blogging, clarify, podcasting, podcast, podcaster, itunes, enclosure, podcasting, audio, video, player, media, rss, mp3, music, embed, flv, flash, id3, episodes, webm, mp4, m4v
 Requires at least:  2.5
 Tested up to:       4.2
-Stable Tag:         1.0.1
+Stable Tag:         1.0.2
 License:            MIT
 
 The Clarify plugin allows you to make any audio or video embedded in your posts, pages, etc searchable via the standard WordPress search box.
@@ -70,6 +70,9 @@ At the time of this writing (May 2015), we support English, Spanish, and French.
 That is a longer question that is hard to answer here. Visit our [How it Works](http://clarify.io/how-clarify-works/) page for more details.
 
 == Changelog ==
+
+= 1.0.2 =
+Updated the search result count to make sure the results of this plugin are combined with the normal result count.
 
 = 1.0.1 =
 We made some major cleanups to the docs to make the plugin easier to use.

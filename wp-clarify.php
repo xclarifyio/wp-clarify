@@ -2,7 +2,7 @@
 /*
 Plugin Name: Podcast Searcher by Clarify
 Plugin URI: http://github.com/Clarify/wp-clarify
-Version: 1.0.1
+Version: 1.0.2
 Author: Aaron Brazell
 Author URI: http://technosailor.com
 Maintainer: Clarify, Inc

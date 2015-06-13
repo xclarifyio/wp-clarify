@@ -1,6 +1,6 @@
 {
     "name": "Clarify/wp-clarify",
-    "version": "1.0",
+    "version": "1.0.2",
     "description": "A WordPress plugin to make podcasts and video blogs searchable using the Clarify API.",
     "keywords": ["api", "audio search", "video search", "podcast search", "podcasters", "video blogging", "clarify", "clarify.io"],
     "homepage": "https://github.com/Clarify/wp-clarify",
