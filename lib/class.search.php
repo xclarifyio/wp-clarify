@@ -185,6 +185,7 @@ class Clarify_Search extends Clarify_API_Base {
             }
         }
         wp_reset_query();
+        $wp_query->found_posts = count($posts);
 
         return $posts;
     }
